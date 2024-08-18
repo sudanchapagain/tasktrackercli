@@ -9,6 +9,9 @@ import java.io.IOException
 @Serializable
 data class Task(val id: Int, var description: String, var status: String = "todo")
 
+val filePath = "tasktrackercli.json"
+val file = File(filePath)
+
 fun main(args: Array<String>) {
     if (args.isEmpty() || args.size < 2) {
         println("Usage: tasktrackercli <command> [<arguments>]")
@@ -31,14 +34,20 @@ fun main(args: Array<String>) {
             addTask(args[1])
         }
 
+        "update" -> {
+            if (args.size < 3) {
+                println("update requires two arguments")
+                println("Usage: tasktrackercli update <id> [<arguments>]")
+                return
+            }
+            updateTask(args[1].toInt(), args[2])
+        }
+
         else -> println("Unknown command: ${args[0]}")
     }
 }
 
 fun checkFile() {
-    val filePath = "task_tracker_cli.json"
-    val file = File(filePath)
-
     if (!file.exists()) {
         try {
             file.createNewFile()
@@ -51,9 +60,6 @@ fun checkFile() {
 
 
 fun addTask(taskDescription: String) {
-    val filePath = "task_tracker_cli.json"
-    val file = File(filePath)
-
     try {
         val jsonString = file.readText()
         // deserialize JSON string to instance of Muteable list where each object is named Task.
@@ -70,3 +76,23 @@ fun addTask(taskDescription: String) {
         println("Error reading or writing to file: ${e.message}")
     }
 }
+
+fun updateTask(taskID: Int, taskDescription: String) {
+    try {
+        val jsonString = file.readText()
+        val tasks = Json.decodeFromString<MutableList<Task>>(jsonString)
+
+        val task = tasks.find { it.id == taskID }
+
+        if (task != null) {
+            task.description = taskDescription
+            file.writeText(Json.encodeToString(tasks))
+            println("Task updated successfully (ID: $taskID)")
+        } else {
+            println("Task not found: $taskID")
+        }
+    } catch (e: IOException) {
+        println("Error reading or writing to file: ${e.message}")
+    }
+}
+
