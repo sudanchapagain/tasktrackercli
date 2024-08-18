@@ -9,7 +9,7 @@ import java.io.IOException
 @Serializable
 data class Task(val id: Int, var description: String, var status: String = "todo")
 
-val filePath = "tasktrackercli.json"
+val filePath = "task_tracker_cli.json"
 val file = File(filePath)
 
 fun main(args: Array<String>) {
@@ -42,6 +42,12 @@ fun main(args: Array<String>) {
             }
             updateTask(args[1].toInt(), args[2])
         }
+
+        "delete" -> {
+            deleteTask(args[1].toInt())
+        }
+
+
 
         else -> println("Unknown command: ${args[0]}")
     }
@@ -90,6 +96,25 @@ fun updateTask(taskID: Int, taskDescription: String) {
             println("Task updated successfully (ID: $taskID)")
         } else {
             println("Task not found: $taskID")
+        }
+    } catch (e: IOException) {
+        println("Error reading or writing to file: ${e.message}")
+    }
+}
+
+fun deleteTask(id: Int) {
+    try {
+        val jsonString = file.readText()
+        val tasks = Json.decodeFromString<MutableList<Task>>(jsonString)
+
+        val task = tasks.find { it.id == id }
+
+        if (task != null) {
+            tasks.remove(task)
+            file.writeText(Json.encodeToString(tasks))
+            println("Task deleted successfully (ID: $id)")
+        } else {
+            println("Task not found: $id")
         }
     } catch (e: IOException) {
         println("Error reading or writing to file: ${e.message}")
