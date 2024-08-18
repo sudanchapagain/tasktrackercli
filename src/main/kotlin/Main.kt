@@ -7,9 +7,9 @@ import java.io.File
 import java.io.IOException
 
 @Serializable
-data class Task(val id: Int, var description: String, var status: String = "todo")
+data class Task(val id: Int, var description: String, var status: String)
 
-val filePath = "task_tracker_cli.json"
+const val filePath = "task_tracker_cli.json"
 val file = File(filePath)
 
 fun main(args: Array<String>) {
@@ -68,11 +68,12 @@ fun checkFile() {
 fun addTask(taskDescription: String) {
     try {
         val jsonString = file.readText()
-        // deserialize JSON string to instance of Muteable list where each object is named Task.
+        // deserialize JSON string to instance of Mutable list where each object is named Task.
         val tasks = Json.decodeFromString<MutableList<Task>>(jsonString)
 
         val newId = (tasks.maxOfOrNull { it.id } ?: 0) + 1
-        val newTask = Task(id = newId, description = taskDescription)
+        val statusState = "todo"
+        val newTask = Task(id = newId, description = taskDescription, status = statusState)
         tasks.add(newTask)
 
         file.writeText(Json.encodeToString(tasks))
