@@ -166,3 +166,27 @@ fun markDone(id: Int) {
         println("Error reading or writing to file: ${e.message}")
     }
 }
+
+fun listTodo(statusCategory: String?) {
+    try {
+        val jsonString = file.readText()
+        val tasks = Json.decodeFromString<MutableList<Task>>(jsonString)
+
+        val filteredTasks = if (statusCategory != null) {
+            tasks.filter { it.status == statusCategory }
+        } else {
+            tasks
+        }
+
+        if (filteredTasks.isEmpty()) {
+            println("No tasks found.")
+        } else {
+            filteredTasks.forEach { task ->
+                println("${task.id}. ${task.description} (${task.status})")
+            }
+        }
+
+    } catch (e: IOException) {
+        println("Error reading or writing to file: ${e.message}")
+    }
+}
