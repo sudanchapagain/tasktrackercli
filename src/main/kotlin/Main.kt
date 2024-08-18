@@ -51,6 +51,10 @@ fun main(args: Array<String>) {
             markInProgress(args[1].toInt())
         }
 
+        "mark-done" -> {
+            markDone(args[1].toInt())
+        }
+
 
         else -> println("Unknown command: ${args[0]}")
     }
@@ -134,6 +138,25 @@ fun markInProgress(id: Int) {
 
         if (task != null) {
             task.status = "in-progress"
+            file.writeText(Json.encodeToString(tasks))
+            println("Task status updated successfully (ID: $id)")
+        } else {
+            println("Task not found: $id")
+        }
+    } catch (e: IOException) {
+        println("Error reading or writing to file: ${e.message}")
+    }
+}
+
+fun markDone(id: Int) {
+    try {
+        val jsonString = file.readText()
+        val tasks = Json.decodeFromString<MutableList<Task>>(jsonString)
+
+        val task = tasks.find { it.id == id }
+
+        if (task != null) {
+            task.status = "done"
             file.writeText(Json.encodeToString(tasks))
             println("Task status updated successfully (ID: $id)")
         } else {
