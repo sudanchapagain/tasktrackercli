@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.0.0"
     kotlin("plugin.serialization") version "2.0.0"
+    application
 }
 
 group = "org.example"
@@ -16,9 +17,24 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
+application {
+    mainClass.set("src.main.kotlin.MainKt")
+}
+
 tasks.test {
     useJUnitPlatform()
 }
+
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = "src.main.kotlin.MainKt"
+    }
+    from({
+        configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) }
+    })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 kotlin {
     jvmToolchain(17)
 }
