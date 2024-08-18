@@ -13,17 +13,8 @@ const val filePath = "task_tracker_cli.json"
 val file = File(filePath)
 
 fun main(args: Array<String>) {
-    if (args.isEmpty() || args.size < 2) {
-        println("Usage: tasktrackercli <command> [<arguments>]")
-        println(
-            "commands:\n" +
-                    "\tadd (task),\n" +
-                    "\tupdate(id, task),\n" +
-                    "\tdelete(id),\n" +
-                    "\tmark-in-progress(id),\n" +
-                    "\tmark-done(id),\n" +
-                    "\tlist(done, todo, in-progress"
-        )
+    if (args.isEmpty()) {
+        printHelp()
         return
     }
 
@@ -44,20 +35,49 @@ fun main(args: Array<String>) {
         }
 
         "delete" -> {
+            if (args.size < 2) {
+                printHelp()
+                return
+            }
             deleteTask(args[1].toInt())
         }
 
         "mark-in-progress" -> {
+            if (args.size < 2) {
+                printHelp()
+            }
             markInProgress(args[1].toInt())
         }
 
         "mark-done" -> {
+            if (args.size < 2) {
+                printHelp()
+                return
+            }
             markDone(args[1].toInt())
+        }
+
+        "list" -> {
+            val category = if (args.size > 1) args[1] else null
+            listTodo(category)
         }
 
 
         else -> println("Unknown command: ${args[0]}")
     }
+}
+
+fun printHelp() {
+    println("Usage: tasktrackercli <command> [<arguments>]")
+    println(
+        "commands:\n" +
+                "\tadd (task),\n" +
+                "\tupdate(id, task),\n" +
+                "\tdelete(id),\n" +
+                "\tmark-in-progress(id),\n" +
+                "\tmark-done(id),\n" +
+                "\tlist(done, todo, in-progress"
+    )
 }
 
 fun checkFile() {
@@ -70,7 +90,6 @@ fun checkFile() {
         }
     }
 }
-
 
 fun addTask(taskDescription: String) {
     try {
